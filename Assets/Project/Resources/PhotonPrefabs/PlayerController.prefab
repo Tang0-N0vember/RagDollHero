@@ -321,6 +321,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthbarImage: {fileID: 6017446995761849624}
   ui: {fileID: 75786254610190795}
+  scoreBoard: {fileID: 0}
   cameraHolder: {fileID: 5671524140677321797}
   mouseSensitivity: 3
   sprintSpeed: 6

@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun.UtilityScripts;
+
 
 public class SingleShotGun : Gun
 {
@@ -24,8 +26,12 @@ public class SingleShotGun : Gun
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
         if(Physics.Raycast(ray, out RaycastHit hit))
         {
+
             hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo)itemInfo).damage);
             PV.RPC("RPC_Shoot", RpcTarget.All, hit.point,hit.normal);
+
+            PV.Owner.AddScore(1);
+            Debug.Log("Playerscore:" + (PV.Owner.GetScore()+1));
         }
     }
 

@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     [SerializeField] GameObject ui;
 
+    [SerializeField] Scoreboard scoreBoard;
+
     [SerializeField] GameObject cameraHolder;
 
     [SerializeField] float mouseSensitivity, sprintSpeed, walkSpeed, jumpForce, smoothTime;
@@ -32,13 +34,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     const float maxHealth = 100f;
     float currentHealth = maxHealth;
 
+    
+
     PlayerManager playerManager;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         PV = GetComponent<PhotonView>();
-
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
     }
     private void Start()
@@ -62,45 +65,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         Look();
         Move();
         Jump();
-
-        for (int i = 0; i < items.Length; i++)
-        {
-            if (Input.GetKeyDown((i+1).ToString()))
-            {
-                EquipItem(i);
-                break;
-            }
-        }
-
-        if(Input.GetAxisRaw("Mouse ScrollWheel") > 0f)
-        {
-            if (itemIndex >= items.Length - 1)
-            {
-                EquipItem(0);
-            }
-            else
-            {
-                EquipItem(itemIndex + 1);
-            }
-            
-            
-        }
-        else if(Input.GetAxisRaw("Mouse ScrollWheel") < 0f)
-        {
-            if (itemIndex <= 0)
-            {
-                EquipItem(items.Length-1);
-            }
-            else
-            {
-                EquipItem(itemIndex - 1);
-            }
-            
-        }
-        if (Input.GetMouseButtonDown(0))
-        {
-            items[itemIndex].Use();
-        }
+        SwitchGuns();
+        //OpenScoreboard();
+        
         if (transform.position.y < -10f)
         {
             Die();
@@ -159,6 +126,62 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         cameraHolder.transform.localEulerAngles = Vector3.left * verticallookRotation;
     }
+    void SwitchGuns()
+    {
+        for (int i = 0; i < items.Length; i++)
+        {
+            if (Input.GetKeyDown((i + 1).ToString()))
+            {
+                EquipItem(i);
+                break;
+            }
+        }
+
+        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0f)
+        {
+            if (itemIndex >= items.Length - 1)
+            {
+                EquipItem(0);
+            }
+            else
+            {
+                EquipItem(itemIndex + 1);
+            }
+
+
+        }
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0f)
+        {
+            if (itemIndex <= 0)
+            {
+                EquipItem(items.Length - 1);
+            }
+            else
+            {
+                EquipItem(itemIndex - 1);
+            }
+
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            items[itemIndex].Use();
+        }
+    }
+    void OpenScoreboard()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (!scoreBoard.open)
+            {
+                scoreBoard.Open();
+            }
+            else
+            {
+                scoreBoard.Close();
+            }
+
+        }
+    }
 
     public void SetGroundedState(bool _grounded)
     {
@@ -194,8 +217,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             Die();
         }
     }
+
+
     void Die()
     {
         playerManager.Die();
+        playerManager.ChangeDeathScore(1f);
     }
 }
